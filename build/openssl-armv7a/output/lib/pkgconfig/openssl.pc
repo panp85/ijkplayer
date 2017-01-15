@@ -1,0 +1,9 @@
+prefix=/home/share/luoha_fsl_imx/ijkplayer-android/android/contrib/build/openssl-armv7a/output
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Version: 1.0.2g
+Requires: libssl libcrypto
