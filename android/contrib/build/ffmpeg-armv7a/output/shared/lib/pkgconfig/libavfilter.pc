@@ -1,0 +1,14 @@
+prefix=/home/panpan/player/ijk_git/ijkplayer-android/android/contrib/build/ffmpeg-armv7a/output/shared
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libavfilter
+Description: FFmpeg audio/video filtering library
+Version: 6.82.100
+Requires: libavutil >= 55.58.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lijkffmpeg -lm -lz -pthread
+Libs.private: 
+Cflags: -I${includedir}
