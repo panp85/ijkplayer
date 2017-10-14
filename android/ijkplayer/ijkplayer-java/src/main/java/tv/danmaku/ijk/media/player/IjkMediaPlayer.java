@@ -340,6 +340,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public void setDataSource(Context context, Uri uri, Map<String, String> headers)
             throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
         final String scheme = uri.getScheme();
+		Log.i(TAG, "ijk panpan test, in setDataSource 2, ContentResolver.SCHEME_FILE, scheme = " + 
+			ContentResolver.SCHEME_FILE + ", " + scheme );
         if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             setDataSource(uri.getPath());
             return;

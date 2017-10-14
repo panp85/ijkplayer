@@ -29,7 +29,22 @@ import java.util.ArrayList;
 
 public class AndroidMediaController extends MediaController implements IMediaController {
     private ActionBar mActionBar;
-
+/*	
+    public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+	    if (!fromuser) {
+	        // We're not interested in programmatically generated changes to
+	        // the progress bar's position.
+	        return;
+	    }
+	    long duration = mPlayer.getDuration();
+	    long newposition = (duration * progress) / 1000L;
+		Log.i("MediaController", "mediacontrol panpan test, in onProgressChanged, progress,duration,newposition = " + 
+			progress + ", " + duration + ", " + newposition);
+	    mPlayer.seekTo( (int) newposition);
+	    if (mCurrentTime != null)
+	        mCurrentTime.setText(stringForTime( (int) newposition));
+	}
+*/	
     public AndroidMediaController(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
@@ -50,7 +65,7 @@ public class AndroidMediaController extends MediaController implements IMediaCon
 
     public void setSupportActionBar(@Nullable ActionBar actionBar) {
         mActionBar = actionBar;
-        if (isShowing()) {
+        if (true/*isShowing()*/) {
             actionBar.show();
         } else {
             actionBar.hide();
@@ -68,7 +83,7 @@ public class AndroidMediaController extends MediaController implements IMediaCon
     public void hide() {
         super.hide();
         if (mActionBar != null)
-            mActionBar.hide();
+         //   mActionBar.hide();
         for (View view : mShowOnceArray)
             view.setVisibility(View.GONE);
         mShowOnceArray.clear();

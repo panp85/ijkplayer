@@ -217,6 +217,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setRender(int render) {
+        Log.i(TAG, "ijk panpan test, in setRender, render = " + render);
         switch (render) {
             case RENDER_NONE:
                 setRenderView(null);
@@ -311,7 +312,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         // called start() previously
         release(false);
 
-        AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);//获得音频服务管理AudioManager
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         try {
@@ -333,12 +334,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mMediaPlayer.setOnTimedTextListener(mOnTimedTextListener);
             mCurrentBufferPercentage = 0;
             String scheme = mUri.getScheme();
+			Log.i(TAG, "ijk panpan test, in openVideo, scheme = " + scheme);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     mSettings.getUsingMediaDataSource() &&
                     (TextUtils.isEmpty(scheme) || scheme.equalsIgnoreCase("file"))) {
+                Log.i(TAG, "ijk panpan test, in openVideo, use FileMediaDataSource.");
                 IMediaDataSource dataSource = new FileMediaDataSource(new File(mUri.toString()));
                 mMediaPlayer.setDataSource(dataSource);
             }  else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+				Log.i(TAG, "ijk panpan test, in openVideo, mMediaPlayer.setDataSource 2.");
                 mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             } else {
                 mMediaPlayer.setDataSource(mUri.toString());
@@ -845,6 +849,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void seekTo(int msec) {
+        Exception e = new Exception("seek panpan test:");
+        e.printStackTrace();
+		Log.i(TAG, "seek panpan test, progress, mPlayer.getDuration(), msec = " + msec + ", " + getDuration());
         if (isInPlaybackState()) {
             mSeekStartTime = System.currentTimeMillis();
             mMediaPlayer.seekTo(msec);
