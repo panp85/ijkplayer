@@ -30,6 +30,8 @@ import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import android.util.Log;
+
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -413,9 +415,10 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
         @Override
         public void onPrepared(MediaPlayer mp) {
             AndroidMediaPlayer self = mWeakMediaPlayer.get();
+			Log.i("AndroidMediaPlayer", "AndroidMediaPlayer ppt, in onPrepared, self = " + self);
             if (self == null)
                 return;
-
+            Log.i("AndroidMediaPlayer", "AndroidMediaPlayer ppt, in onPrepared, go to notifyOnPrepared.\n");
             notifyOnPrepared();
         }
 
