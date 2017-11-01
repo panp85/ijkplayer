@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package tv.danmaku.ijk.media.exo.demo.player;
+import android.util.Log;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -60,6 +61,7 @@ public class ExtractorRendererBuilder implements RendererBuilder {
 
     // Build the video and audio renderers.
     DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(mainHandler, null);
+	Log.i("ExtractorRendererBuilder", "ijk panpan test, in buildRenderers, userAgent = " + userAgent);
     DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
     ExtractorSampleSource sampleSource = new ExtractorSampleSource(uri, dataSource, allocator,
         BUFFER_SEGMENT_COUNT * BUFFER_SEGMENT_SIZE, mainHandler, player, 0);

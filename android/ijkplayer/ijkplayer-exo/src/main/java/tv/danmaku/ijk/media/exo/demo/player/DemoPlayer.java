@@ -313,7 +313,7 @@ public class DemoPlayer implements ExoPlayer.Listener, ChunkSampleSource.EventLi
         ? ((MediaCodecTrackRenderer) renderers[TYPE_AUDIO]).codecCounters : null;
     this.bandwidthMeter = bandwidthMeter;
     pushSurface(false);
-    player.prepare(renderers);
+    player.prepare(renderers);//
     rendererBuildingState = RENDERER_BUILDING_STATE_BUILT;
   }
 
