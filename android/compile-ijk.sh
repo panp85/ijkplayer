@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+export ANDROID_SDK="home/panpan/tool/tools_r25"
+export ANDROID_NDK="/home/panpan/tool/android-ndk-r13b"
 
 if [ -z "$ANDROID_NDK" -o -z "$ANDROID_NDK" ]; then
     echo "You must define ANDROID_NDK, ANDROID_SDK before starting."
