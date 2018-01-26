@@ -345,6 +345,9 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     AVAppTcpIOControl control = {0};
     DnsCacheEntry *dns_entry = NULL;
 
+	char addrstr[100]; 
+	void *ptr; 
+
     if (s->open_timeout < 0) {
         s->open_timeout = 15000000;
     }
@@ -384,6 +387,7 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
 
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags |= AI_CANONNAME; 
     snprintf(portstr, sizeof(portstr), "%d", port);
     if (s->listen)
         hints.ai_flags |= AI_PASSIVE;
@@ -422,6 +426,19 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
         av_log(NULL, AV_LOG_INFO, "Hit DNS cache hostname = %s\n", hostname);
         cur_ai = dns_entry->res;
     }
+	inet_ntop (cur_ai->ai_family, cur_ai->ai_addr->sa_data, addrstr, 100); 
+	 switch (cur_ai->ai_family)  
+    {  
+    case AF_INET:  
+      ptr = &((struct sockaddr_in *) cur_ai->ai_addr)->sin_addr;  
+      break;  
+    case AF_INET6:  
+      ptr = &((struct sockaddr_in6 *) cur_ai->ai_addr)->sin6_addr;  
+      break;  
+    }  
+      inet_ntop (cur_ai->ai_family, ptr, addrstr, 100);  
+      av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, IPv%d address: %s (%s)\n", cur_ai->ai_family == PF_INET6 ? 6 : 4,  
+              addrstr, cur_ai->ai_canonname);
 
  restart:
 #if HAVE_STRUCT_SOCKADDR_IN6

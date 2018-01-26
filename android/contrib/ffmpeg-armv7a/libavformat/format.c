@@ -202,13 +202,16 @@ AVInputFormat *av_probe_input_format3(AVProbeData *pd, int is_opened,
 
     fmt = NULL;
     while ((fmt1 = av_iformat_next(fmt1))) {
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in av_probe_input_format3, fmt1: %s, flag: %d\n", 
+			fmt1->name, (!(fmt1->flags & AVFMT_NOFILE))?1:0);
         if (!is_opened == !(fmt1->flags & AVFMT_NOFILE) && strcmp(fmt1->name, "image2"))
             continue;
         score = 0;
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in av_probe_input_format3, fmt1->read_probe: %s\n", fmt1->read_probe?"yes":"no");
         if (fmt1->read_probe) {
             score = fmt1->read_probe(&lpd);
-            if (score)
-                av_log(NULL, AV_LOG_TRACE, "Probing %s score:%d size:%d\n", fmt1->name, score, lpd.buf_size);
+            if (1/*score*/)
+                av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, Probing %s score:%d size:%d\n", fmt1->name, score, lpd.buf_size);
             if (fmt1->extensions && av_match_ext(lpd.filename, fmt1->extensions)) {
                 switch (nodat) {
                 case NO_ID3:
@@ -242,7 +245,7 @@ AVInputFormat *av_probe_input_format3(AVProbeData *pd, int is_opened,
     if (nodat == ID3_GREATER_PROBE)
         score_max = FFMIN(AVPROBE_SCORE_EXTENSION / 2 - 1, score_max);
     *score_ret = score_max;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in av_probe_input_format3, score_ret: %d, fmt: %s\n", *score_ret, fmt?fmt->name:NULL);
     return fmt;
 }
 

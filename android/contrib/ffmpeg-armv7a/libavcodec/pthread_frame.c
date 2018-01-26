@@ -196,6 +196,7 @@ static attribute_align_arg void *frame_worker_thread(void *arg)
 
         av_frame_unref(p->frame);
         p->got_frame = 0;
+//		av_log(NULL, AV_LOG_INFO, "frame_worker_thread ppt, codec->name = %s.\n", codec->name);
         p->result = codec->decode(avctx, p->frame, &p->got_frame, &p->avpkt);
 
         if ((p->result < 0 || !p->got_frame) && p->frame->buf[0]) {
@@ -438,12 +439,14 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
     if (!p->avctx->thread_safe_callbacks && (
          p->avctx->get_format != avcodec_default_get_format ||
          p->avctx->get_buffer2 != avcodec_default_get_buffer2)) {
+        av_log(NULL, AV_LOG_INFO, "submit_packet ppt, 1.\n");
         while (atomic_load(&p->state) != STATE_SETUP_FINISHED && atomic_load(&p->state) != STATE_INPUT_READY) {
             int call_done = 1;
             pthread_mutex_lock(&p->progress_mutex);
             while (atomic_load(&p->state) == STATE_SETTING_UP)
                 pthread_cond_wait(&p->progress_cond, &p->progress_mutex);
-
+            av_log(NULL, AV_LOG_INFO, "submit_packet ppt, atomic_load_explicit: %d.\n", 
+                atomic_load_explicit(&p->state, memory_order_acquire));
             switch (atomic_load_explicit(&p->state, memory_order_acquire)) {
             case STATE_GET_BUFFER:
                 p->result = ff_get_buffer(p->avctx, p->requested_frame, p->requested_flags);
@@ -462,6 +465,10 @@ static int submit_packet(PerThreadContext *p, AVCodecContext *user_avctx,
             pthread_mutex_unlock(&p->progress_mutex);
         }
     }
+	else
+	{
+	    //av_log(NULL, AV_LOG_INFO, "submit_packet ppt, 2.\n");
+	}
 
     fctx->prev_thread = p;
     fctx->next_decoding++;

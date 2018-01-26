@@ -2828,6 +2828,7 @@ static int read_thread(void *arg)
         if (codecpar->width)
             set_default_window_size(codecpar->width, codecpar->height, sar);
     }
+	ALOGI("read_thread ppt, ffplay.c, go to stream_component_open.\n");
 
     /* open the streams */
     if (st_index[AVMEDIA_TYPE_AUDIO] >= 0) {

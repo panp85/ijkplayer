@@ -543,7 +543,7 @@ static void fill_buffer(AVIOContext *s)
     }
 
     if (s->read_packet)
-        len = s->read_packet(s->opaque, dst, len);
+        len = s->read_packet(s->opaque, dst, len);//io_read_packet
     else
         len = 0;
     if (len <= 0) {
@@ -616,6 +616,7 @@ int avio_read(AVIOContext *s, unsigned char *buf, int size)
         len = FFMIN(s->buf_end - s->buf_ptr, size);
         if (len == 0 || s->write_flag) {
             if((s->direct || size > s->buffer_size) && !s->update_checksum) {
+				//av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in avio_read, 1.\n");
                 // bypass the buffer and read data directly into buf
                 if(s->read_packet)
                     len = s->read_packet(s->opaque, buf, size);
@@ -637,12 +638,14 @@ int avio_read(AVIOContext *s, unsigned char *buf, int size)
                     s->buf_end = s->buffer/* + len*/;
                 }
             } else {
+                //av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in avio_read, 2.\n");
                 fill_buffer(s);
                 len = s->buf_end - s->buf_ptr;
                 if (len == 0)
                     break;
             }
         } else {
+            //av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in avio_read, 3.\n");
             memcpy(buf, s->buf_ptr, len);
             buf += len;
             s->buf_ptr += len;

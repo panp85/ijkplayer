@@ -234,13 +234,15 @@ static int http_open_cnx_internal(URLContext *h, AVDictionary **options)
 
     if (!s->hd) {
         av_dict_set_int(options, "ijkapplication", (int64_t)(intptr_t)s->app_ctx, 0);
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in http_open_cnx_internal, go to ffurl_open_whitelist, buf: %s.\n", 
+		    buf);
         err = ffurl_open_whitelist(&s->hd, buf, AVIO_FLAG_READ_WRITE,
                                    &h->interrupt_callback, options,
                                    h->protocol_whitelist, h->protocol_blacklist, h);
         if (err < 0)
             return err;
     }
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in http_open_cnx_internal, path,local_path,hoststr: %s, %s, %s.\n", path, local_path, hoststr);
     av_strlcpy(prev_location, s->location, sizeof(prev_location));
     err = http_connect(h, path, local_path, hoststr,
                        auth, proxyauth, &location_changed);
@@ -527,6 +529,7 @@ static int http_open(URLContext *h, const char *uri, int flags,
         return http_listen(h, uri, flags, options);
     }
     av_application_will_http_open(s->app_ctx, (void*)h, uri);
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in http_open, go to http_open_cnx.\n");
     ret = http_open_cnx(h, options);
     av_application_did_http_open(s->app_ctx, (void*)h, uri, ret, s->http_code);
     if (ret < 0)
@@ -994,7 +997,7 @@ static int http_read_header(URLContext *h, int *new_location)
         if ((err = http_get_line(s, line, sizeof(line))) < 0)
             return err;
 
-        av_log(h, AV_LOG_TRACE, "header='%s'\n", line);
+        av_log(h, AV_LOG_INFO, "ffmpeg ppt, in http_read_header, header='%s'\n", line);
 
         err = process_line(h, line, s->line_count, new_location);
         if (err < 0)
@@ -1138,7 +1141,7 @@ static int http_connect(URLContext *h, const char *path, const char *local_path,
              authstr ? authstr : "",
              proxyauthstr ? "Proxy-" : "", proxyauthstr ? proxyauthstr : "");
 
-    av_log(h, AV_LOG_DEBUG, "request: %s\n", s->buffer);
+    av_log(h, AV_LOG_INFO, "ffmpeg ppt, in http_connect, request: %s\n", s->buffer);
 
     if (strlen(headers) + 1 == sizeof(headers) ||
         ret >= sizeof(s->buffer)) {

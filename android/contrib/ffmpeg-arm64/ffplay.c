@@ -561,6 +561,8 @@ static int decoder_decode_frame(Decoder *d, AVFrame *frame, AVSubtitle *sub) {
 
         if (d->queue->abort_request)
             return -1;
+		av_log(NULL, AV_LOG_INFO, "decoder_decode_frame ppt, in ffplay.c, d->packet_pending = %d, d->queue->serial, d->pkt_serial: %d, %d.\n", 
+							d->packet_pending, d->queue->serial, d->pkt_serial);
 
         if (!d->packet_pending || d->queue->serial != d->pkt_serial) {
             AVPacket pkt;
@@ -1969,6 +1971,7 @@ static int audio_thread(void *arg)
     do {
         if ((got_frame = decoder_decode_frame(&is->auddec, frame, NULL)) < 0)
             goto the_end;
+		av_log(NULL, AV_LOG_INFO, "decoder_decode_frame ppt, in ffplay.c, 3.\n");
 
         if (got_frame) {
                 tb = (AVRational){1, frame->sample_rate};
@@ -2621,7 +2624,8 @@ static int stream_component_open(VideoState *is, int stream_index)
     case AVMEDIA_TYPE_VIDEO:
         is->video_stream = stream_index;
         is->video_st = ic->streams[stream_index];
-
+        av_log(NULL,AV_LOG_INFO, "stream_component_open ppt, go to decoder_init video_thread.\n");
+		ALOGI("stream_component_open ppt, go to decoder_init video_thread.\n");
         decoder_init(&is->viddec, avctx, &is->videoq, is->continue_read_thread);
         if ((ret = decoder_start(&is->viddec, video_thread, is)) < 0)
             goto out;

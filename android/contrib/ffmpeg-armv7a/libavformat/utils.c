@@ -399,12 +399,16 @@ static int init_input(AVFormatContext *s, const char *filename,
     int score = AVPROBE_SCORE_RETRY;
 
     if (s->pb) {
+		av_log(s, AV_LOG_WARNING, "ffmpeg ppt, in init_input, s->pb yes.\n");
         s->flags |= AVFMT_FLAG_CUSTOM_IO;
         if (!s->iformat)
+        {
+            av_log(s, AV_LOG_WARNING, "ffmpeg ppt, in init_input, go to av_probe_input_buffer2.\n");
             return av_probe_input_buffer2(s->pb, &s->iformat, filename,
                                          s, 0, s->format_probesize);
+        }
         else if (s->iformat->flags & AVFMT_NOFILE)
-            av_log(s, AV_LOG_WARNING, "Custom AVIOContext makes no sense and "
+            av_log(s, AV_LOG_WARNING, "ffmpeg ppt, Custom AVIOContext makes no sense and "
                                       "will be ignored with AVFMT_NOFILE format.\n");
         return 0;
     }
@@ -412,12 +416,13 @@ static int init_input(AVFormatContext *s, const char *filename,
     if ((s->iformat && s->iformat->flags & AVFMT_NOFILE) ||
         (!s->iformat && (s->iformat = av_probe_input_format2(&pd, 0, &score))))
         return score;
-
+	av_log(s, AV_LOG_WARNING, "ffmpeg ppt, in init_input, go to s->io_open.\n");
     if ((ret = s->io_open(s, &s->pb, filename, AVIO_FLAG_READ | s->avio_flags, options)) < 0)
         return ret;
 
     if (s->iformat)
         return 0;
+	av_log(s, AV_LOG_WARNING, "ffmpeg ppt, in init_input, go to av_probe_input_buffer2 2.\n");
     return av_probe_input_buffer2(s->pb, &s->iformat, filename,
                                  s, 0, s->format_probesize);
 }

@@ -108,6 +108,7 @@ FF_DISABLE_DEPRECATION_WARNINGS
         return s->open_cb(s, pb, url, flags, &s->interrupt_callback, options);
 FF_ENABLE_DEPRECATION_WARNINGS
 #endif
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in io_open_default, go to ffio_open_whitelist, url = %s.\n", url);
 
     return ffio_open_whitelist(pb, url, flags, &s->interrupt_callback, options, s->protocol_whitelist, s->protocol_blacklist);
 }

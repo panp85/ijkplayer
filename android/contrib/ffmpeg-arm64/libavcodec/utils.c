@@ -2269,9 +2269,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
         avctx->internal->pkt = &tmp;
         if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME)
+        {
+            av_log(avctx, AV_LOG_ERROR, "avcodec_decode_video2 ppt, go to ff_thread_decode_frame.\n");
             ret = ff_thread_decode_frame(avctx, picture, got_picture_ptr,
                                          &tmp);
         else {
+			av_log(avctx, AV_LOG_ERROR, "avcodec_decode_video2 ppt, HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME no.\n");
             ret = avctx->codec->decode(avctx, picture, got_picture_ptr,
                                        &tmp);
             if (!(avctx->codec->caps_internal & FF_CODEC_CAP_SETS_PKT_DTS))
