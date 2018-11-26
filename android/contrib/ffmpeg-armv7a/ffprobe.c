@@ -2712,7 +2712,7 @@ static int open_input_file(InputFile *ifile, const char *filename)
     AVDictionaryEntry *t;
     AVDictionary **opts;
     int scan_all_pmts_set = 0;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in open_input_file, go in.\n");
     fmt_ctx = avformat_alloc_context();
     if (!fmt_ctx) {
         print_error(filename, AVERROR(ENOMEM));
@@ -2846,7 +2846,7 @@ static int probe_file(WriterContext *wctx, const char *filename)
 
     do_read_frames = do_show_frames || do_count_frames;
     do_read_packets = do_show_packets || do_count_packets;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in probe_file, go to open_input_file.\n");
     ret = open_input_file(&ifile, filename);
     if (ret < 0)
         goto end;

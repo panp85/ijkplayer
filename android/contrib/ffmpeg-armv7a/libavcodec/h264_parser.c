@@ -645,7 +645,7 @@ static int h264_split(AVCodecContext *avctx,
     int has_pps    = 0;
     const uint8_t *ptr = buf, *end = buf + buf_size;
     int nalu_type;
-
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt split, in h264_split, go in.\n");
     while (ptr < end) {
         ptr = avpriv_find_start_code(ptr, end, &state);
         if ((state & 0xFFFFFF00) != 0x100)

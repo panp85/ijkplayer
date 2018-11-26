@@ -636,6 +636,8 @@ static AVCodec *choose_decoder(OptionsContext *o, AVFormatContext *s, AVStream *
     char *codec_name = NULL;
 
     MATCH_PER_STREAM_OPT(codec_names, str, codec_name, s, st);
+	av_log(NULL, AV_LOG_ERROR, "ppt, in choose_decoder, codec_name, st->codecpar->codec_id: %s, %d.\n",
+		codec_name, st->codecpar->codec_id);
     if (codec_name) {
         AVCodec *codec = find_codec_or_die(codec_name, st->codecpar->codec_type, 0);
         st->codecpar->codec_id = codec->id;

@@ -95,6 +95,7 @@ typedef struct SDL_Vout_Opaque {
 
 static SDL_VoutOverlay *func_create_overlay_l(int width, int height, int frame_format, SDL_Vout *vout)
 {
+    ALOGI("vout ppt, in func_create_overlay_l, frame_format = %d.\n", frame_format);
     switch (frame_format) {
     case IJK_AV_PIX_FMT__ANDROID_MEDIACODEC:
         return SDL_VoutAMediaCodec_CreateOverlay(width, height, vout);
@@ -163,6 +164,7 @@ static int func_display_overlay_l(SDL_Vout *vout, SDL_VoutOverlay *overlay)
         ALOGE("func_display_overlay_l: invalid overlay dimensions(%d, %d)", overlay->w, overlay->h);
         return -1;
     }
+	//ALOGI("vout ppt, in func_display_overlay_l, overlay->format = %d.\n", overlay->format);
 
     switch(overlay->format) {
     case SDL_FCC__AMC: {
@@ -182,14 +184,19 @@ static int func_display_overlay_l(SDL_Vout *vout, SDL_VoutOverlay *overlay)
     case SDL_FCC_RV16:
     case SDL_FCC_RV32: {
         // both GLES & ANativeWindow support
+        ALOGI("vout ppt, in func_display_overlay_l, vout->overlay_format = 0x%x.\n", vout->overlay_format);
         if (vout->overlay_format == SDL_FCC__GLES2 && opaque->egl)
+        {   
+            ALOGI("vout ppt, in func_display_overlay_l, go to IJK_EGL_display.\n");
             return IJK_EGL_display(opaque->egl, native_window, overlay);
+        }
         break;
     }
     }
 
     // fallback to ANativeWindow
     IJK_EGL_terminate(opaque->egl);
+	//ALOGI("vout ppt, in func_display_soverlay_l, go to SDL_Android_NativeWindow_display_l.\n");
     return SDL_Android_NativeWindow_display_l(native_window, overlay); 
 }
 
@@ -322,7 +329,8 @@ static SDL_AMediaCodecBufferProxy *SDL_VoutAndroid_obtainBufferProxy_l(SDL_Vout 
 {
     SDL_Vout_Opaque *opaque = vout->opaque;
     SDL_AMediaCodecBufferProxy *proxy = NULL;
-
+    ALOGI("ijk ppt, in SDL_VoutAndroid_obtainBufferProxy_l, opaque->overlay_pool: %d, acodec_serial = %d.\n", 
+		ISDL_Array__size(&opaque->overlay_pool), acodec_serial);
     if (ISDL_Array__size(&opaque->overlay_pool) > 0) {
         proxy = ISDL_Array__pop_back(&opaque->overlay_pool);
         SDL_AMediaCodecBufferProxy_reset(proxy);
@@ -418,7 +426,7 @@ static int SDL_VoutAndroid_releaseBufferProxy(SDL_Vout *vout, SDL_AMediaCodecBuf
 
     if (!proxy)
         return 0;
-
+    ALOGI("ijk ppt, in SDL_VoutAndroid_releaseBufferProxy, go to SDL_VoutAndroid_releaseBufferProxy_l.\n");
     SDL_LockMutex(vout->mutex);
     ret = SDL_VoutAndroid_releaseBufferProxy_l(vout, proxy, render);
     SDL_UnlockMutex(vout->mutex);
@@ -443,7 +451,7 @@ int SDL_VoutAndroid_releaseBufferProxyP_l(SDL_Vout *vout, SDL_AMediaCodecBufferP
 
     if (!proxy)
         return 0;
-
+	ALOGI("ijk ppt, in SDL_VoutAndroid_releaseBufferProxyP_l, go to SDL_VoutAndroid_releaseBufferProxy_l.\n");
     ret = SDL_VoutAndroid_releaseBufferProxy_l(vout, *proxy, render);
     *proxy = NULL;
     return ret;

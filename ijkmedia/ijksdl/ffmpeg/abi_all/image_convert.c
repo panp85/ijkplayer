@@ -31,6 +31,7 @@ int ijk_image_convert(int width, int height,
     enum AVPixelFormat src_format, const uint8_t **src_data, const int *src_linesize)
 {
 #if defined(__ANDROID__)
+    
     switch (src_format) {
         case AV_PIX_FMT_YUV420P:
         case AV_PIX_FMT_YUVJ420P: // FIXME: 9 not equal to AV_PIX_FMT_YUV420P, but a workaround
@@ -50,10 +51,12 @@ int ijk_image_convert(int width, int height,
                     dst_data[0], dst_linesize[0],
                     width, height);
             default:
+				av_log(NULL, AV_LOG_WARNING, "ppt, in ijk_image_convert, no process 1 .\n");
                 break;
             }
             break;
         default:
+			av_log(NULL, AV_LOG_WARNING, "ppt, in ijk_image_convert, no process 2.\n");
             break;
     }
 #endif

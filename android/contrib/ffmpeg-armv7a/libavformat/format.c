@@ -288,6 +288,7 @@ int av_probe_input_buffer2(AVIOContext *pb, AVInputFormat **fmt,
         return AVERROR(EINVAL);
 
     if (pb->av_class) {
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in av_probe_input_buffer2, pb->av_class yes.\n");
         uint8_t *mime_type_opt = NULL;
         char *semi;
         av_opt_get(pb, "mime_type", AV_OPT_SEARCH_CHILDREN, &mime_type_opt);
@@ -297,6 +298,10 @@ int av_probe_input_buffer2(AVIOContext *pb, AVInputFormat **fmt,
             *semi = '\0';
         }
     }
+	else
+	{
+	    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in av_probe_input_buffer2, pb->av_class no.\n");
+	}
 #if 0
     if (!*fmt && pb->av_class && av_opt_get(pb, "mime_type", AV_OPT_SEARCH_CHILDREN, &mime_type) >= 0 && mime_type) {
         if (!av_strcasecmp(mime_type, "audio/aacp")) {

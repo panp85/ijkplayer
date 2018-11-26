@@ -274,6 +274,8 @@ static const struct URLProtocol *url_find_protocol(const char *filename)
         return NULL;
     for (i = 0; protocols[i]; i++) {
             const URLProtocol *up = protocols[i];
+		av_log(NULL, 8, "ffmpeg ppt, in url_find_protocol, proto_str, up->name = %s, %s.\n", 
+		    proto_str, up->name);
         if (!strcmp(proto_str, up->name)) {
             av_freep(&protocols);
             return up;

@@ -584,9 +584,11 @@ static int ensure_playlist(HLSContext *c, struct playlist **pls, const char *url
 {
     if (*pls)
         return 0;
+	//av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in ensure_playlist, c->n_playlists 1 = %d.\n", c->n_playlists);
     if (!new_variant(c, NULL, url, NULL))
         return AVERROR(ENOMEM);
     *pls = c->playlists[c->n_playlists - 1];
+	//av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in ensure_playlist, c->n_playlists 2 = %d.\n", c->n_playlists);
     return 0;
 }
 
@@ -696,6 +698,7 @@ static int parse_playlist(HLSContext *c, const char *url,
         url = new_url;
 
     read_chomp_line(in, line, sizeof(line));
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in parse_playlist, line: %s.\n", line);
     if (strcmp(line, "#EXTM3U")) {
         ret = AVERROR_INVALIDDATA;
         goto fail;
@@ -707,6 +710,7 @@ static int parse_playlist(HLSContext *c, const char *url,
         pls->type = PLS_TYPE_UNSPECIFIED;
     }
     while (!avio_feof(in)) {
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in parse_playlist, line: %s.\n", line);
         read_chomp_line(in, line, sizeof(line));
         if (av_strstart(line, "#EXT-X-STREAM-INF:", &ptr)) {
             is_variant = 1;
@@ -779,6 +783,7 @@ static int parse_playlist(HLSContext *c, const char *url,
         } else if (av_strstart(line, "#", NULL)) {
             continue;
         } else if (line[0]) {
+			av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in parse_playlist, line: %s.\n", line);
             if (is_variant) {
                 if (!new_variant(c, &variant_info, line, url)) {
                     ret = AVERROR(ENOMEM);
@@ -827,6 +832,7 @@ static int parse_playlist(HLSContext *c, const char *url,
                 }
 
                 ff_make_absolute_url(tmp_str, sizeof(tmp_str), url, line);
+				av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, hls in parse_playlist, tmp_str: %s.\n", tmp_str);
                 seg->url = av_strdup(tmp_str);
                 if (!seg->url) {
                     av_free(seg->key);
@@ -1291,6 +1297,7 @@ restart:
 reload:
         if (!v->finished &&
             av_gettime_relative() - v->last_load_time >= reload_interval) {
+            av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in read_data, go to parse_playlist, v->url: %s.\n", v->url);
             if ((ret = parse_playlist(c, v->url, v, NULL)) < 0) {
                 av_log(v->parent, AV_LOG_WARNING, "Failed to reload playlist %d\n",
                        v->index);
@@ -1452,9 +1459,11 @@ static int select_cur_seq_no(HLSContext *c, struct playlist *pls)
 
     if (!pls->finished && !c->first_packet &&
         av_gettime_relative() - pls->last_load_time >= default_reload_interval(pls))
+    {
+        av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in select_cur_seq_no, go to parse_playlist.\n");
         /* reload the playlist since it was suspended */
         parse_playlist(c, pls->url, pls, NULL);
-
+    }
     /* If playback is already in progress (we are just selecting a new
      * playlist) and this is a complete file, find the matching segment
      * by counting durations. */
@@ -1565,11 +1574,13 @@ static int set_stream_info_from_input_stream(AVStream *st, struct playlist *pls,
 static int update_streams_from_subdemuxer(AVFormatContext *s, struct playlist *pls)
 {
     int err;
-
     while (pls->n_main_streams < pls->ctx->nb_streams) {
         int ist_idx = pls->n_main_streams;
         AVStream *st = avformat_new_stream(s, NULL);
         AVStream *ist = pls->ctx->streams[ist_idx];
+		av_log(NULL, AV_LOG_INFO, 
+			"ffmpeg ppt, in update_streams_from_subdemuxer, pls->n_main_streams, pls->ctx->nb_streams =%d, %d,\n",
+				pls->n_main_streams, pls->ctx->nb_streams);
 
         if (!st)
             return AVERROR(ENOMEM);
@@ -1703,7 +1714,8 @@ static int hls_read_header(AVFormatContext *s, AVDictionary **options)
         if (var->subtitles_group[0])
             add_renditions_to_variant(c, var, AVMEDIA_TYPE_SUBTITLE, var->subtitles_group);
     }
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in hls_read_header, c->n_variants, c->n_playlists = %d, %d.\n",
+        c->n_variants, c->n_playlists);
     /* Create a program for each variant */
     for (i = 0; i < c->n_variants; i++) {
         struct variant *v = c->variants[i];
@@ -1795,7 +1807,7 @@ static int hls_read_header(AVFormatContext *s, AVDictionary **options)
             pls->id3_deferred_extra = NULL;
         }
 
-        if (pls->is_id3_timestamped == -1)
+        if (pls->is_id3_timestamped == -1);
             av_log(s, AV_LOG_WARNING, "No expected HTTP requests have been made\n");
 
         /*

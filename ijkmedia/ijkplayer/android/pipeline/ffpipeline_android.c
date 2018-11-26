@@ -71,10 +71,15 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
     IJKFF_Pipenode        *node = NULL;
 
     if (ffp->mediacodec_all_videos || ffp->mediacodec_avc || ffp->mediacodec_hevc || ffp->mediacodec_mpeg2)
+    {
+        ALOGI("ffpipeline ppt, in func_open_video_decoder, go to ffpipenode_create_video_decoder_from_android_mediacodec.\n");
         node = ffpipenode_create_video_decoder_from_android_mediacodec(ffp, pipeline, opaque->weak_vout);
+    }
     if (!node) {
+		ALOGI("ffpipeline ppt, in func_open_video_decoder, go to ffpipenode_create_video_decoder_from_ffplay.\n");
         node = ffpipenode_create_video_decoder_from_ffplay(ffp);
     }
+	ALOGI("ffpipeline ppt, in func_open_video_decoder, 2.\n");
 
     return node;
 }

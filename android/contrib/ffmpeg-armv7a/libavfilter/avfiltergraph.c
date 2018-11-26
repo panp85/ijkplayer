@@ -1246,7 +1246,7 @@ static int graph_insert_fifos(AVFilterGraph *graph, AVClass *log_ctx)
                    avfilter_get_by_name("afifo");
 
             snprintf(name, sizeof(name), "auto_fifo_%d", fifo_count++);
-
+            av_log(NULL, AV_LOG_WARNING, "ppt, in graph_insert_fifos, name: %s.\n", name);
             ret = avfilter_graph_create_filter(&fifo_ctx, fifo, name, NULL,
                                                NULL, graph);
             if (ret < 0)

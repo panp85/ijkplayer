@@ -765,7 +765,7 @@ int attribute_align_arg sws_scale(struct SwsContext *c,
     int srcStride2[4];
     int dstStride2[4];
     int srcSliceY_internal = srcSliceY;
-
+    av_log(NULL, AV_LOG_INFO, "ppt, in sws_scale, go in.\n");
     if (!srcStride || !dstStride || !dst || !srcSlice) {
         av_log(c, AV_LOG_ERROR, "One of the input parameters to sws_scale() is NULL, please check the calling code\n");
         return 0;

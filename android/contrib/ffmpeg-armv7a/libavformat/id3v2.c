@@ -1067,17 +1067,21 @@ static void id3v2_read_internal(AVIOContext *pb, AVDictionary **metadata,
     do {
         /* save the current offset in case there's nothing to read/skip */
         off = avio_tell(pb);
+		av_log(NULL, AV_LOG_ERROR, "ppt, in id3v2_read_internal, off = %d.\n", off);
         if (max_search_size && off - start >= max_search_size - ID3v2_HEADER_SIZE) {
             avio_seek(pb, off, SEEK_SET);
+			av_log(NULL, AV_LOG_ERROR, "ppt, in id3v2_read_internal,  break 1.\n");
             break;
         }
 
         ret = avio_read(pb, buf, ID3v2_HEADER_SIZE);
         if (ret != ID3v2_HEADER_SIZE) {
             avio_seek(pb, off, SEEK_SET);
+			av_log(NULL, AV_LOG_ERROR, "ppt, in id3v2_read_internal,  break 2.\n");
             break;
         }
         found_header = ff_id3v2_match(buf, magic);
+		av_log(NULL, AV_LOG_ERROR, "ppt, in id3v2_read_internal,  found_header = %d.\n", found_header);
         if (found_header) {
             /* parse ID3v2 header */
             len = ((buf[6] & 0x7f) << 21) |

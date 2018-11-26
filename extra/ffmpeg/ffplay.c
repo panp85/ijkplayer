@@ -561,7 +561,8 @@ static int decoder_decode_frame(Decoder *d, AVFrame *frame, AVSubtitle *sub) {
 
         if (d->queue->abort_request)
             return -1;
-
+        av_log(NULL, AV_LOG_INFO, "decoder_decode_frame ppt, in extra ffplay.c  d->packet_pending = %d, d->queue->serial, d->pkt_serial: %d, %d.\n", 
+            d->packet_pending, d->queue->serial, d->pkt_serial);
         if (!d->packet_pending || d->queue->serial != d->pkt_serial) {
             AVPacket pkt;
             do {
@@ -1675,6 +1676,7 @@ display:
 static int queue_picture(VideoState *is, AVFrame *src_frame, double pts, double duration, int64_t pos, int serial)
 {
     Frame *vp;
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in queue_picture extra ffplay.c, go in.\n");
 
 #if defined(DEBUG_SYNC)
     printf("frame_type=%c pts=%0.3f\n",
@@ -1699,6 +1701,7 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts, double 
     set_default_window_size(vp->width, vp->height, vp->sar);
 
     av_frame_move_ref(vp->frame, src_frame);
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in queue_picture extra ffplay.c, go to frame_queue_push\n");
     frame_queue_push(&is->pictq);
     return 0;
 }

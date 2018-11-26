@@ -229,6 +229,12 @@ int SDL_Android_NativeWindow_display_l(ANativeWindow *native_window, SDL_VoutOve
     }
 
     AndroidHalFourccDescriptor *voutDesc = native_window_get_desc(curr_format);
+	//if(voutDesc && overlayDesc)
+	if(1){
+	    av_log(NULL, AV_LOG_INFO, "ppt, in SDL_Android_NativeWindow_display_l, overlay->format, curr_format: %x[%s], %x[%s].\n", 
+		    overlay->format, (overlayDesc == NULL)?"null":(overlayDesc->name), curr_format, (voutDesc == NULL)?"null":(voutDesc->name));
+	}
+	
     if (!voutDesc || voutDesc->hal_format != overlayDesc->hal_format) {
         ALOGD("ANativeWindow_setBuffersGeometry: w=%d, h=%d, f=%.4s(0x%x) => w=%d, h=%d, f=%.4s(0x%x)",
             curr_w, curr_h, (char*) &curr_format, curr_format,

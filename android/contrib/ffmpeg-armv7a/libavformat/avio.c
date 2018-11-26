@@ -295,7 +295,7 @@ int ffurl_alloc(URLContext **puc, const char *filename, int flags,
                 const AVIOInterruptCB *int_cb)
 {
     const URLProtocol *p = NULL;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in ffurl_alloc, filename: %s.\n", filename);
     p = url_find_protocol(filename);
     if (p)
        return url_alloc_for_protocol(puc, p, filename, flags, int_cb);

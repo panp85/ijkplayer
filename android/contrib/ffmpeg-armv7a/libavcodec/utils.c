@@ -1244,7 +1244,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     int ret = 0;
     AVDictionary *tmp = NULL;
     const AVPixFmtDescriptor *pixdesc;
-
+	av_log(avctx, AV_LOG_ERROR, "ffmpeg ppt, in avcodec_open2, go in.\n");
     if (avcodec_is_open(avctx))
         return 0;
 
@@ -1257,6 +1257,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
                                     "but %s passed to avcodec_open2()\n", avctx->codec->name, codec->name);
         return AVERROR(EINVAL);
     }
+	av_log(avctx, AV_LOG_ERROR, "ffmpeg ppt, in avcodec_open2, 3.\n");
     if (!codec)
         codec = avctx->codec;
 
@@ -1275,6 +1276,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         ret = AVERROR(ENOMEM);
         goto end;
     }
+	av_log(avctx, AV_LOG_ERROR, "ffmpeg ppt, in avcodec_open2, 5.\n");
 
     avctx->internal->pool = av_mallocz(sizeof(*avctx->internal->pool));
     if (!avctx->internal->pool) {
@@ -1301,6 +1303,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     }
 
     avctx->internal->skip_samples_multiplier = 1;
+	av_log(avctx, AV_LOG_ERROR, "ffmpeg ppt, in avcodec_open2, codec->priv_data_size: %d.\n", codec->priv_data_size);
 
     if (codec->priv_data_size > 0) {
         if (!avctx->priv_data) {
@@ -1327,16 +1330,18 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         ret = AVERROR(EINVAL);
         goto free_and_end;
     }
-
+    av_log(NULL, AV_LOG_WARNING, 
+        "ffmpeg ppt, in avcodec_open2, avctx->coded_width, avctx->coded_height, avctx->width, avctx->height = %d, %d, %d, %d, codec name: %s.\n",
+        avctx->coded_width, avctx->coded_height, avctx->width, avctx->height, codec->name);
     // only call ff_set_dimensions() for non H.264/VP6F/DXV codecs so as not to overwrite previously setup dimensions
     if (!(avctx->coded_width && avctx->coded_height && avctx->width && avctx->height &&
           (avctx->codec_id == AV_CODEC_ID_H264 || avctx->codec_id == AV_CODEC_ID_VP6F || avctx->codec_id == AV_CODEC_ID_DXV))) {
-    if (avctx->coded_width && avctx->coded_height)
-        ret = ff_set_dimensions(avctx, avctx->coded_width, avctx->coded_height);
-    else if (avctx->width && avctx->height)
-        ret = ff_set_dimensions(avctx, avctx->width, avctx->height);
-    if (ret < 0)
-        goto free_and_end;
+	    if (avctx->coded_width && avctx->coded_height)
+	        ret = ff_set_dimensions(avctx, avctx->coded_width, avctx->coded_height);
+	    else if (avctx->width && avctx->height)
+	        ret = ff_set_dimensions(avctx, avctx->width, avctx->height);
+	    if (ret < 0)
+	        goto free_and_end;
     }
 
     if ((avctx->coded_width || avctx->coded_height || avctx->width || avctx->height)
@@ -1416,6 +1421,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 
     if (HAVE_THREADS
         && !(avctx->internal->frame_thread_encoder && (avctx->active_thread_type&FF_THREAD_FRAME))) {
+        av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in avcodec_open2, go to ff_thread_init.\n");
         ret = ff_thread_init(avctx);
         if (ret < 0) {
             goto free_and_end;
@@ -1614,6 +1620,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     if (   avctx->codec->init && (!(avctx->active_thread_type&FF_THREAD_FRAME)
         || avctx->internal->frame_thread_encoder)) {
+        av_log(NULL, AV_LOG_WARNING, "ffmpeg ppt, in avcodec_open2, go to avctx->codec->init, avctx->codec: %s.\n", 
+			avctx->codec->name);
         ret = avctx->codec->init(avctx);
         if (ret < 0) {
             goto free_and_end;
@@ -2385,9 +2393,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
             goto fail;
 
         avctx->internal->pkt = &tmp;
-        if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME)
+        if (HAVE_THREADS && avctx->active_thread_type & FF_THREAD_FRAME){
+			av_log(NULL, AV_LOG_ERROR, "ppt, in avcodec_decode_audio4, go to ff_thread_decode_frame.\n");
             ret = ff_thread_decode_frame(avctx, frame, got_frame_ptr, &tmp);
+        }
         else {
+			av_log(NULL, AV_LOG_ERROR, "ppt, in avcodec_decode_audio4, go to avctx->codec->decode.\n");
             ret = avctx->codec->decode(avctx, frame, got_frame_ptr, &tmp);
             av_assert0(ret <= tmp.size);
             frame->pkt_dts = avpkt->dts;
@@ -3139,6 +3150,7 @@ static AVCodec *find_encdec(enum AVCodecID id, int encoder)
     p = first_avcodec;
     id= remap_deprecated_codec_id(id);
     while (p) {
+		av_log(NULL, AV_LOG_WARNING, "ppt, in find_encdec, p->name: %s.\n", p->name);
         if ((encoder ? av_codec_is_encoder(p) : av_codec_is_decoder(p)) &&
             p->id == id) {
             if (p->capabilities & AV_CODEC_CAP_EXPERIMENTAL && !experimental) {

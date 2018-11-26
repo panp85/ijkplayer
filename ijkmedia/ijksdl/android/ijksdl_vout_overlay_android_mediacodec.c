@@ -107,7 +107,7 @@ inline static bool check_object(SDL_VoutOverlay* object, const char *func_name)
 static int func_fill_frame(SDL_VoutOverlay *overlay, const AVFrame *frame)
 {
     assert(frame->format == IJK_AV_PIX_FMT__ANDROID_MEDIACODEC);
-
+    ALOGI("vout ppt, in func_fill_frame, android_mediacodec, go in.\n");
     SDL_VoutOverlay_Opaque *opaque = overlay->opaque;
 
     if (!check_object(overlay, __func__))

@@ -279,11 +279,12 @@ sdl_amedia_status_t SDL_AMediaCodecFake_queueFakeFrame(SDL_AMediaCodec* acodec, 
 ssize_t SDL_AMediaCodecFake_dequeueOutputBuffer(SDL_AMediaCodec* acodec, SDL_AMediaCodecBufferInfo *info, int64_t timeoutUs)
 {    
     if (SDL_AMediaCodec_FakeFifo_size(&acodec->common->fake_fifo) > 0) {
+		ALOGI("ijk ppt, in SDL_AMediaCodecFake_dequeueOutputBuffer, go to SDL_AMediaCodec_FakeFifo_dequeueOutputBuffer.\n");
         ssize_t ret = SDL_AMediaCodec_FakeFifo_dequeueOutputBuffer(&acodec->common->fake_fifo, info, 0);
         if (ret >= 0)
             return ret;
     }
-
+//	ALOGI("ijk ppt, in SDL_AMediaCodecFake_dequeueOutputBuffer, go to acodec->func_dequeueOutputBuffer.\n");
     assert(acodec->func_dequeueOutputBuffer);
     return acodec->func_dequeueOutputBuffer(acodec, info, timeoutUs);
 }

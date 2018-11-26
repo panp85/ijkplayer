@@ -171,11 +171,13 @@ static attribute_align_arg void *frame_worker_thread(void *arg)
 
     pthread_mutex_lock(&p->mutex);
     while (1) {
+		//av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in frame_worker_thread, in while 1.\n");
         while (atomic_load(&p->state) == STATE_INPUT_READY && !p->die)
             pthread_cond_wait(&p->input_cond, &p->mutex);
+		//av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in frame_worker_thread, in while 2.\n");
 
         if (p->die) break;
-
+        
         if (!codec->update_thread_context && THREAD_SAFE_CALLBACKS(avctx))
             ff_thread_finish_setup(avctx);
 
@@ -196,7 +198,7 @@ static attribute_align_arg void *frame_worker_thread(void *arg)
 
         av_frame_unref(p->frame);
         p->got_frame = 0;
-//		av_log(NULL, AV_LOG_INFO, "frame_worker_thread ppt, codec->name = %s.\n", codec->name);
+		av_log(NULL, AV_LOG_INFO, "frame_worker_thread ppt, codec->name = %s.\n", codec->name);
         p->result = codec->decode(avctx, p->frame, &p->got_frame, &p->avpkt);
 
         if ((p->result < 0 || !p->got_frame) && p->frame->buf[0]) {
@@ -748,7 +750,7 @@ int ff_frame_thread_init(AVCodecContext *avctx)
         else
             thread_count = avctx->thread_count = 1;
     }
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in ff_frame_thread_init, thread_count = %d.\n", thread_count);
     if (thread_count <= 1) {
         avctx->active_thread_type = 0;
         return 0;
@@ -830,7 +832,7 @@ int ff_frame_thread_init(AVCodecContext *avctx)
         }
 
         if (err) goto error;
-
+        av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in ff_frame_thread_init, go to pthread_create frame_worker_thread.\n");
         err = AVERROR(pthread_create(&p->thread, NULL, frame_worker_thread, p));
         p->thread_init= !err;
         if(!p->thread_init)

@@ -37,7 +37,7 @@ static void func_destroy(IJKFF_Pipenode *node)
 static int func_run_sync(IJKFF_Pipenode *node)
 {
     IJKFF_Pipenode_Opaque *opaque = node->opaque;
-
+    ALOGI("func_run_sync ppt, in ffpipenode_ffplay_vdec.c, go in.\n");
     return ffp_video_thread(opaque->ffp);
 }
 

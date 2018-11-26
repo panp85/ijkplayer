@@ -39,6 +39,7 @@ static IJKFF_Pipenode *func_open_video_decoder(IJKFF_Pipeline *pipeline, FFPlaye
 {
     IJKFF_Pipenode* node = NULL;
     IJKFF_Pipeline_Opaque *opaque = pipeline->opaque;
+	ALOGI("ffpipeline ppt, in func_open_video_decoder, 3.\n");
     if (ffp->videotoolbox) {
         node = ffpipenode_create_video_decoder_from_ios_videotoolbox(ffp);
         if (!node)

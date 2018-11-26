@@ -219,7 +219,7 @@ static int mpegvideo_split(AVCodecContext *avctx,
     int i;
     uint32_t state= -1;
     int found=0;
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt split, in mpegvideo_split, go in.\n");
     for(i=0; i<buf_size; i++){
         state= (state<<8) | buf[i];
         if(state == 0x1B3){

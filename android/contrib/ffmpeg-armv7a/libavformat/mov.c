@@ -1780,7 +1780,7 @@ static int mov_read_stco(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     if (!sc->chunk_offsets)
         return AVERROR(ENOMEM);
     sc->chunk_count = entries;
-
+    av_log(NULL, AV_LOG_WARNING, "ppt, in mov_read_stco, 1 sc->chunk_count = %d.\n", sc->chunk_count);
     if      (atom.type == MKTAG('s','t','c','o'))
         for (i = 0; i < entries && !pb->eof_reached; i++)
             sc->chunk_offsets[i] = avio_rb32(pb);
@@ -1791,6 +1791,7 @@ static int mov_read_stco(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         return AVERROR_INVALIDDATA;
 
     sc->chunk_count = i;
+	av_log(NULL, AV_LOG_WARNING, "ppt, in mov_read_stco, 2 sc->chunk_count = %d.\n", sc->chunk_count);
 
     if (pb->eof_reached)
         return AVERROR_EOF;
@@ -2487,6 +2488,7 @@ static int mov_read_stps(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     return 0;
 }
 
+//关键帧点，随机访问点 stss：关键帧index。
 static int mov_read_stss(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 {
     AVStream *st;
@@ -3365,6 +3367,8 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
         int64_t dts_correction = 0;
         int rap_group_present = sc->rap_group_count && sc->rap_group;
         int key_off = (sc->keyframe_count && sc->keyframes[0] > 0) || (sc->stps_count && sc->stps_data[0] > 0);
+		av_log(mov->fc, AV_LOG_WARNING, "mov ppt, in mov_build_index, 1111, st->nb_index_entries = %d.\n", 
+			st->nb_index_entries);
 
         current_dts -= sc->dts_shift;
         last_dts     = current_dts;
@@ -3384,10 +3388,12 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
         for (i = 0; i < sc->chunk_count; i++) {
             int64_t next_offset = i+1 < sc->chunk_count ? sc->chunk_offsets[i+1] : INT64_MAX;
             current_offset = sc->chunk_offsets[i];
+		    //stsc:sample-to-chunk,只有一个trunk时，调过？
             while (mov_stsc_index_valid(stsc_index, sc->stsc_count) &&
                 i + 1 == sc->stsc_data[stsc_index + 1].first)
                 stsc_index++;
-
+			//av_log(mov->fc, AV_LOG_WARNING, "mov ppt, in mov_build_index, stsc_index = %d.\n", 
+			//			stsc_index); 
             if (next_offset > current_offset && sc->sample_size>0 && sc->sample_size < sc->stsz_sample_size &&
                 sc->stsc_data[stsc_index].count * (int64_t)sc->stsz_sample_size > next_offset - current_offset) {
                 av_log(mov->fc, AV_LOG_WARNING, "STSZ sample size %d invalid (too large), ignoring\n", sc->stsz_sample_size);
@@ -3414,6 +3420,8 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
                     if (stps_index + 1 < sc->stps_count)
                         stps_index++;
                 }
+				//av_log(mov->fc, AV_LOG_WARNING, "mov ppt, in mov_build_index, rap_group_present = %d.\n", 
+				//		rap_group_present); 
                 if (rap_group_present && rap_group_index < sc->rap_group_count) {
                     if (sc->rap_group[rap_group_index].index > 0)
                         keyframe = 1;
@@ -3486,6 +3494,7 @@ static void mov_build_index(MOVContext *mov, AVStream *st)
             st->codecpar->bit_rate = stream_size*8*sc->time_scale/st->duration;
     } else {
         unsigned chunk_samples, total = 0;
+		av_log(mov->fc, AV_LOG_WARNING, "mov ppt, in mov_build_index, 2222.\n");
 
         // compute total chunk count
         for (i = 0; i < sc->stsc_count; i++) {

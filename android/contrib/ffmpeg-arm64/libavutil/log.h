@@ -25,6 +25,9 @@
 #include "avutil.h"
 #include "attributes.h"
 #include "version.h"
+#include <android/log.h>
+
+#define ALOGI(level, TAG, ...)    ((void)__android_log_print(level, TAG, __VA_ARGS__))
 
 typedef enum {
     AV_CLASS_CATEGORY_NA = 0,

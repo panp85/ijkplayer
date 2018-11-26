@@ -1675,6 +1675,7 @@ display:
 static int queue_picture(VideoState *is, AVFrame *src_frame, double pts, double duration, int64_t pos, int serial)
 {
     Frame *vp;
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in queue_picture, go in.\n");
 
 #if defined(DEBUG_SYNC)
     printf("frame_type=%c pts=%0.3f\n",
@@ -1699,6 +1700,7 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts, double 
     set_default_window_size(vp->width, vp->height, vp->sar);
 
     av_frame_move_ref(vp->frame, src_frame);
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in queue_picture, go to frame_queue_push.\n");
     frame_queue_push(&is->pictq);
     return 0;
 }
@@ -1743,7 +1745,7 @@ static int configure_filtergraph(AVFilterGraph *graph, const char *filtergraph,
     int ret, i;
     int nb_filters = graph->nb_filters;
     AVFilterInOut *outputs = NULL, *inputs = NULL;
-
+    av_log(NULL, AV_LOG_WARNING, "ppt, in configure_filtergraph, filtergraph: %s.\n", filtergraph);
     if (filtergraph) {
         outputs = avfilter_inout_alloc();
         inputs  = avfilter_inout_alloc();

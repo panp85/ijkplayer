@@ -132,6 +132,7 @@ static int mpeg4video_parse(AVCodecParserContext *s,
 {
     ParseContext *pc = s->priv_data;
     int next;
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt split, in mpeg4video_parse, go in.\n");
 
     if (s->flags & PARSER_FLAG_COMPLETE_FRAMES) {
         next = buf_size;

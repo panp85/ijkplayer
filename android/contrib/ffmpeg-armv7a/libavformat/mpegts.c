@@ -829,7 +829,7 @@ static int mpegts_set_stream_info(AVStream *st, PESContext *pes,
             if (!sub_pes)
                 return AVERROR(ENOMEM);
             memcpy(sub_pes, pes, sizeof(*sub_pes));
-
+            av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in mpegts_set_stream_info mpegts, go to avformat_new_stream.\n");
             sub_st = avformat_new_stream(pes->stream, NULL);
             if (!sub_st) {
                 av_free(sub_pes);
@@ -1060,7 +1060,7 @@ static int mpegts_push_data(MpegTSFilter *filter,
                     if (!pes->st) {
                         if (ts->skip_changes)
                             goto skip;
-
+						av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in mpegts_push_data mpegts, go to avformat_new_stream.\n");
                         pes->st = avformat_new_stream(ts->stream, NULL);
                         if (!pes->st)
                             return AVERROR(ENOMEM);
@@ -2010,6 +2010,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
         if (ts->pids[pid] && ts->pids[pid]->type == MPEGTS_PES) {
             pes = ts->pids[pid]->u.pes_filter.opaque;
             if (!pes->st) {
+				av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in pmt_cb 1 mpegts, go to avformat_new_stream.\n");
                 pes->st     = avformat_new_stream(pes->stream, NULL);
                 if (!pes->st)
                     goto out;
@@ -2021,6 +2022,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
                 mpegts_close_filter(ts, ts->pids[pid]); // wrongly added sdt filter probably
             pes = add_pes_stream(ts, pid, pcr_pid);
             if (pes) {
+				av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in pmt_cb 2 mpegts, go to avformat_new_stream.\n");
                 st = avformat_new_stream(pes->stream, NULL);
                 if (!st)
                     goto out;
@@ -2031,6 +2033,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
             if (idx >= 0) {
                 st = ts->stream->streams[idx];
             } else {
+                av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in pmt_cb 3 mpegts, go to avformat_new_stream.\n");
                 st = avformat_new_stream(ts->stream, NULL);
                 if (!st)
                     goto out;
@@ -2557,6 +2560,8 @@ static int mpegts_probe(AVProbeData *p)
     maxscore = maxscore * CHECK_COUNT / CHECK_BLOCK;
 
     ff_dlog(0, "TS score: %d %d\n", sumscore, maxscore);
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in mpegts_probe, TS score: %d %d, check_count: %d.\n", 
+		sumscore, maxscore, check_count);
 
     if        (check_count > CHECK_COUNT && sumscore > 6) {
         return AVPROBE_SCORE_MAX   + sumscore - CHECK_COUNT;
@@ -2657,7 +2662,7 @@ static int mpegts_read_header(AVFormatContext *s)
         const uint8_t *data;
 
         /* only read packets */
-
+		av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in mpegts_read_header mpegts, go to avformat_new_stream.\n");
         st = avformat_new_stream(s, NULL);
         if (!st)
             return AVERROR(ENOMEM);

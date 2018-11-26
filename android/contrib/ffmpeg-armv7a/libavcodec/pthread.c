@@ -70,7 +70,7 @@ static void validate_thread_parameters(AVCodecContext *avctx)
 int ff_thread_init(AVCodecContext *avctx)
 {
     validate_thread_parameters(avctx);
-
+    av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in ff_thread_init, avctx->active_thread_type = 0x%x.\n", avctx->active_thread_type);
     if (avctx->active_thread_type&FF_THREAD_SLICE)
         return ff_slice_thread_init(avctx);
     else if (avctx->active_thread_type&FF_THREAD_FRAME)

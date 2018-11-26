@@ -168,6 +168,7 @@ static int func_fill_frame(SDL_VoutOverlay *overlay, const AVFrame *frame)
     int need_swap_uv = 0;
     int use_linked_frame = 0;
     enum AVPixelFormat dst_format = AV_PIX_FMT_NONE;
+	ALOGI("vout ppt, in func_fill_frame ffmpeg, overlay->format = %x, frame->format = %d.\n", overlay->format, frame->format);
     switch (overlay->format) {
         case SDL_FCC_YV12:
             need_swap_uv = 1;
@@ -192,7 +193,7 @@ static int func_fill_frame(SDL_VoutOverlay *overlay, const AVFrame *frame)
                 dst_format = AV_PIX_FMT_YUV444P10LE;
             }
             break;
-        case SDL_FCC_RV32:
+        case SDL_FCC_RV32://rgb32 rgba8888
             dst_format = AV_PIX_FMT_0BGR32;
             break;
         case SDL_FCC_RV24:
@@ -250,11 +251,14 @@ static int func_fill_frame(SDL_VoutOverlay *overlay, const AVFrame *frame)
      (int)(const uint8_t**) frame->data,
      (int)frame->linesize);
      */
+     ALOGI("vout ppt, in func_fill_frame, frame->format, use_linked_frame: %d, dst_format: %d, %d.\n", 
+         use_linked_frame, frame->format, dst_format);
     if (use_linked_frame) {
         // do nothing
     } else if (ijk_image_convert(frame->width, frame->height,
                                  dst_format, swscale_dst_pic.data, swscale_dst_pic.linesize,
                                  frame->format, (const uint8_t**) frame->data, frame->linesize)) {
+        //ALOGI("vout ppt, in func_fill_frame, go to sws_getCachedContext.\n");
         opaque->img_convert_ctx = sws_getCachedContext(opaque->img_convert_ctx,
                                                        frame->width, frame->height, frame->format, frame->width, frame->height,
                                                        dst_format, opaque->sws_flags, NULL, NULL, NULL);
@@ -284,6 +288,7 @@ static SDL_Class g_vout_overlay_ffmpeg_class = {
 SDL_VoutOverlay *SDL_VoutFFmpeg_CreateOverlay(int width, int height, int frame_format, SDL_Vout *display)
 {
     Uint32 overlay_format = display->overlay_format;
+	ALOGE("vout ppt, in SDL_VoutFFmpeg_CreateOverlay, go in, overlay_format: %x, frame_format: %d.\n", overlay_format, frame_format);
     switch (overlay_format) {
         case SDL_FCC__GLES2: {
             switch (frame_format) {
@@ -303,7 +308,7 @@ SDL_VoutOverlay *SDL_VoutFFmpeg_CreateOverlay(int width, int height, int frame_f
             break;
         }
     }
-
+	ALOGE("vout ppt, in SDL_VoutFFmpeg_CreateOverlay, after, overlay_format: %x.\n", overlay_format);
     SDLTRACE("SDL_VoutFFmpeg_CreateOverlay(w=%d, h=%d, fmt=%.4s(0x%x, dp=%p)\n",
         width, height, (const char*) &overlay_format, overlay_format, display);
 

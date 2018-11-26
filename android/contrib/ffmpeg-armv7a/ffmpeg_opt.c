@@ -999,7 +999,7 @@ static int open_input_file(OptionsContext *o, const char *filename)
         av_dict_set(&o->g->format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
     remove_avoptions(&o->g->format_opts, o->g->codec_opts);
     assert_avoptions(o->g->format_opts);
-
+    
     /* apply forced codec ids */
     for (i = 0; i < ic->nb_streams; i++)
         choose_decoder(o, ic, ic->streams[i]);
@@ -3240,6 +3240,7 @@ int ffmpeg_parse_options(int argc, char **argv)
     term_init();
 
     /* open input files */
+	av_log(NULL, AV_LOG_INFO, "ffmpeg ppt, in ffmpeg_parse_options, go to open_input_file.\n");
     ret = open_files(&octx.groups[GROUP_INFILE], "input", open_input_file);
     if (ret < 0) {
         av_log(NULL, AV_LOG_FATAL, "Error opening input files: ");

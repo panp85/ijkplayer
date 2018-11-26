@@ -178,10 +178,14 @@ static int recreate_format_l(JNIEnv *env, IJKFF_Pipenode *node)
     ALOGI("AMediaFormat: %s, %dx%d\n", opaque->mcc.mime_type, opaque->codecpar->width, opaque->codecpar->height);
     SDL_AMediaFormat_deleteP(&opaque->output_aformat);
     opaque->input_aformat = SDL_AMediaFormatJava_createVideoFormat(env, opaque->mcc.mime_type, opaque->codecpar->width, opaque->codecpar->height);
-    if (opaque->codecpar->extradata && opaque->codecpar->extradata_size > 0) {
+	ALOGI("recreate_format_l ppt, opaque->codecpar->extradata: %s, opaque->codecpar->extradata_size = %d.\n", 
+		opaque->codecpar->extradata?"yes":"no", opaque->codecpar->extradata_size);//opaque->codecpar->extradata定义的位置在哪
+
+	if (opaque->codecpar->extradata && opaque->codecpar->extradata_size > 0) {
         if ((opaque->codecpar->codec_id == AV_CODEC_ID_H264 && opaque->codecpar->extradata[0] == 1)
             || (opaque->codecpar->codec_id == AV_CODEC_ID_HEVC && opaque->codecpar->extradata_size > 3
                 && (opaque->codecpar->extradata[0] == 1 || opaque->codecpar->extradata[1] == 1))) {
+               ALOGI("recreate_format_l ppt, 1.\n");
 #if AMC_USE_AVBITSTREAM_FILTER
             if (opaque->codecpar->codec_id == AV_CODEC_ID_H264) {
                 opaque->bsfc = av_bitstream_filter_init("h264_mp4toannexb");
@@ -206,6 +210,7 @@ static int recreate_format_l(JNIEnv *env, IJKFF_Pipenode *node)
             for(int i = 0; i < opaque->codecpar->extradata_size; i+=4) {
                 ALOGE("csd-0[%d]: %02x%02x%02x%02x\n", opaque->codecpar->extradata_size, (int)opaque->codecpar->extradata[i+0], (int)opaque->codecpar->extradata[i+1], (int)opaque->codecpar->extradata[i+2], (int)opaque->codecpar->extradata[i+3]);
             }
+			
             SDL_AMediaFormat_setBuffer(opaque->input_aformat, "csd-0", opaque->codecpar->extradata, opaque->codecpar->extradata_size);
 #else
             size_t   sps_pps_size   = 0;
@@ -230,6 +235,7 @@ static int recreate_format_l(JNIEnv *env, IJKFF_Pipenode *node)
                     goto fail;
                 }
             }
+			
             SDL_AMediaFormat_setBuffer(opaque->input_aformat, "csd-0", convert_buffer, sps_pps_size);
             for(int i = 0; i < sps_pps_size; i+=4) {
                 ALOGE("csd-0[%d]: %02x%02x%02x%02x\n", (int)sps_pps_size, (int)convert_buffer[i+0], (int)convert_buffer[i+1], (int)convert_buffer[i+2], (int)convert_buffer[i+3]);
@@ -237,6 +243,7 @@ static int recreate_format_l(JNIEnv *env, IJKFF_Pipenode *node)
             free(convert_buffer);
 #endif
         } else if (opaque->codecpar->codec_id == AV_CODEC_ID_MPEG4) {
+            ALOGI("recreate_format_l ppt, opaque->codecpar->codec_id == AV_CODEC_ID_MPEG4.\n");
             size_t esds_dec_dscr_type_length = opaque->codecpar->extradata_size + 0x18;
             size_t esds_es_dscr_type_length = esds_dec_dscr_type_length + 0x08;
             size_t esds_size = esds_es_dscr_type_length + 0x05;
@@ -1108,11 +1115,14 @@ static int drain_output_buffer_l(JNIEnv *env, IJKFF_Pipenode *node, int64_t time
         }
 #endif
 #ifdef FFP_AMC_DISABLE_OUTPUT
+        
         if (!(bufferInfo.flags & AMEDIACODEC__BUFFER_FLAG_FAKE_FRAME)) {
+			ALOGI("ijk ppt, in drain_output_buffer_l, FFP_AMC_DISABLE_OUTPUT yes, AMEDIACODEC__BUFFER_FLAG_FAKE_FRAME no.\n");
             SDL_AMediaCodec_releaseOutputBuffer(opaque->acodec, output_buffer_index, false);
         }
         goto done;
 #endif
+		ALOGI("ijk ppt, in drain_output_buffer_l, FFP_AMC_DISABLE_OUTPUT no, opaque->n_buf_out, opaque->off_buf_out = %d, %d.\n", opaque->n_buf_out, opaque->off_buf_out);
 
         if (opaque->n_buf_out) {
             AMC_Buf_Out *buf_out;
@@ -1511,7 +1521,7 @@ static int func_run_sync(IJKFF_Pipenode *node)
     AVRational             frame_rate = av_guess_frame_rate(is->ic, is->video_st, NULL);
     double                 duration;
     double                 pts;
-
+    ALOGI("func_run_sync ppt, in ffpipenode_android_mediacodec_vdec.c, go in.\n");
     if (!opaque->acodec) {
         return ffp_video_thread(ffp);
     }
@@ -1529,7 +1539,7 @@ static int func_run_sync(IJKFF_Pipenode *node)
     if (!opaque->enqueue_thread) {
         ALOGE("%s: SDL_CreateThreadEx failed\n", __func__);
         ret = -1;
-        goto fail;
+        goto fail; 
     }
 
     while (!q->abort_request) {
@@ -1542,6 +1552,7 @@ static int func_run_sync(IJKFF_Pipenode *node)
             SDL_CondSignal(opaque->acodec_first_dequeue_output_cond);
             SDL_UnlockMutex(opaque->acodec_first_dequeue_output_mutex);
         }
+		ALOGI("func_run_sync ppt, in ffpipenode_android_mediacodec_vdec.c, drain_output_buffer ret = %d.\n", ret);
         if (ret != 0) {
             ret = -1;
             if (got_frame && frame->opaque)
@@ -1568,6 +1579,7 @@ static int func_run_sync(IJKFF_Pipenode *node)
                             ffp->stat.drop_frame_count++;
                             ffp->stat.drop_frame_rate = (float)(ffp->stat.drop_frame_count) / (float)(ffp->stat.decode_frame_count);
                             if (frame->opaque) {
+								ALOGI("func_run_sync ppt, in ffpipenode_android_mediacodec_vdec.c, go to SDL_VoutAndroid_releaseBufferProxyP.\n");
                                 SDL_VoutAndroid_releaseBufferProxyP(opaque->weak_vout, (SDL_AMediaCodecBufferProxy **)&frame->opaque, false);
                             }
                             av_frame_unref(frame);
@@ -1576,6 +1588,7 @@ static int func_run_sync(IJKFF_Pipenode *node)
                     }
                 }
             }
+			ALOGI("func_run_sync ppt, in ffpipenode_android_mediacodec_vdec.c, go to ffp_queue_picture.\n");
             ret = ffp_queue_picture(ffp, frame, pts, duration, av_frame_get_pkt_pos(frame), is->viddec.pkt_serial);
             if (ret) {
                 if (frame->opaque)
@@ -1719,7 +1732,7 @@ IJKFF_Pipenode *ffpipenode_create_video_decoder_from_android_mediacodec(FFPlayer
         opaque->mcc.level   = opaque->codecpar->level;
         break;
     case AV_CODEC_ID_HEVC:
-        if (!ffp->mediacodec_hevc && !ffp->mediacodec_all_videos) {
+        if (0/*!ffp->mediacodec_hevc && !ffp->mediacodec_all_videos*/) {
             ALOGE("%s: MediaCodec/HEVC is disabled. codec_id:%d \n", __func__, opaque->codecpar->codec_id);
             goto fail;
         }
@@ -1771,7 +1784,7 @@ IJKFF_Pipenode *ffpipenode_create_video_decoder_from_android_mediacodec(FFPlayer
         ALOGE("%s:open_video_decoder: SDL_CreateCond() failed\n", __func__);
         goto fail;
     }
-
+    ALOGE("ppt, in ffpipenode_create_video_decoder_from_android_mediacodec, go to recreate_format_l.\n");
     ret = recreate_format_l(env, node);
     if (ret) {
         ALOGE("amc: recreate_format_l failed\n");
@@ -1784,11 +1797,13 @@ IJKFF_Pipenode *ffpipenode_create_video_decoder_from_android_mediacodec(FFPlayer
     }
 
     jsurface = ffpipeline_get_surface_as_global_ref(env, pipeline);
+	ALOGE("ppt, in ffpipenode_create_video_decoder_from_android_mediacodec, go to reconfigure_codec_l.\n");
     ret = reconfigure_codec_l(env, node, jsurface);
     J4A_DeleteGlobalRef__p(env, &jsurface);
-    if (ret != 0)
+    if (ret != 0){
+		ALOGE("ppt, in ffpipenode_create_video_decoder_from_android_mediacodec, go to fail 3.\n");
         goto fail;
-
+    }
     ffp_set_video_codec_info(ffp, MEDIACODEC_MODULE_NAME, opaque->mcc.codec_name);
 
     opaque->off_buf_out = 0;
